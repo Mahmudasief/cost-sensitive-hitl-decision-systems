@@ -75,6 +75,31 @@ This deliberate scope isolates decision-layer effects and avoids confounding fro
 All experiments and analyses are implemented in Jupyter notebooks to emphasize transparency and reproducibility of decision-layer evaluation.
 
 
+## Reproducibility
+
+This repository follows a notebook-first research workflow.
+
+### Environment
+All experiments were run using Python ≥3.9.  
+Minimal dependencies are listed in `requirements.txt`.
+
+To install:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Execution Order
+Empirical analyses are executed in the following order:
+
+1. Notebooks in `notebooks/` for data loading, cost modeling, and evaluation
+2. Results are summarized and reported in:
+   - `RESULTS.md`
+   - `RESULTS_NUMBERS.md`
+
+No model retraining or stochastic pipelines are used; results are deterministic given the dataset and parameters.
+
+
 ## Why This Matters
 
 Most HITL systems are evaluated using accuracy-centric metrics, which can obscure real operational trade-offs. This work shows that:
