@@ -63,7 +63,7 @@ The paper explicitly avoids universal claims. Results are presented as condition
 
 ### Objection 3: “This is obvious to practitioners”
 **Response:**  
-Despite practitioner intuition, HITL is routinely deployed without explicit cost modeling. The prevalence of naive review policies in production systems suggests that these trade-offs are not formally understood or operationalized.
+Despite practitioner intuition, HITL is routinely deployed without explicit cost modeling. The prevalence of naive review policies in production systems suggests that these trade-offs are not formally operationalized, despite their prevalence in production systems.
 
 ### Objection 4: “The contribution is incremental”
 **Response:**  
