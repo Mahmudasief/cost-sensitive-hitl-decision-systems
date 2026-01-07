@@ -16,6 +16,9 @@ This automated baseline serves as the reference point against which all HITL pol
 
 In several regimes, especially those with moderate false-negative costs and non-trivial review cost, the automated baseline achieves the lowest expected cost among all evaluated policies.
 
+Importantly, none of the top-ranked (lowest total cost) human-in-the-loop (HITL) configurations outperform the automated baseline. All HITL policies that beat the baseline occur outside the extreme low-cost region and require specific cost asymmetries.
+
+
 ---
 
 ## Effect of Cost-Sensitive Thresholding
@@ -41,7 +44,8 @@ These findings contradict the common assumption that adding human review is inhe
 
 ## Selective HITL and Marginal Gains
 
-Selective review strategies that prioritize high-risk or boundary cases outperform fixed-rate review in certain regimes.
+Selective review strategies that prioritize high-risk or boundary cases can outperform fixed-rate HITL policies in specific cost regimes; however, these strategies still do not achieve lower total expected cost than the optimal automated baseline.
+
 
 However, the gains from selective HITL are typically **marginal** and occur only when:
 - False-negative costs are sufficiently high
@@ -68,6 +72,8 @@ Our results reveal three distinct empirical regimes:
 - Review costs are low
 - Review is applied selectively to highest-risk cases
 - HITL yields modest reductions in expected cost
+- Improvements occur away from the global cost minimum and do not dominate the optimal automated policy
+
 
 ### Regime III: HITL-Dominant Failure
 
@@ -94,4 +100,6 @@ This demonstrates that, under asymmetric error costs, decision policy and review
 3. Selective HITL is beneficial only under narrow and explicit economic conditions.
 4. HITL effectiveness is regime-dependent, not universal.
 5. Decision-layer optimization is a first-order concern in high-stakes ML systems.
+
+
 
