@@ -9,6 +9,7 @@ Human reviewers are modeled using fixed accuracy and cost parameters. In real AM
 
 **Mitigation:**  
 The objective of this study is not to model human cognition but to analyze decision-layer economics. Sensitivity analyses across a wide range of reviewer accuracy and cost parameters demonstrate that the qualitative findings persist across plausible operational regimes.
+Specifically, we observe consistent regime boundaries across reviewer correction probabilities ranging from 0.5 to 0.9.
 
 ### Assumption of Fixed Cost Parameters
 False-positive, false-negative, and review costs are treated as exogenous and fixed.
@@ -30,7 +31,7 @@ The proposed framework applies broadly to any high-stakes decision system with a
 The study relies on publicly available or AML-style datasets rather than proprietary bank data.
 
 **Mitigation:**  
-The contribution is methodological rather than empirical benchmarking. The findings concern decision-policy structure and cost trade-offs, which are dataset-agnostic under standard supervised learning assumptions.
+The contribution is methodological rather than empirical benchmarking; conclusions concern decision-policy structure and cost trade-offs, not absolute performance levels.
 
 ---
 
