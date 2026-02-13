@@ -46,35 +46,38 @@ This deliberate scope isolates decision-layer effects and avoids confounding fro
 
 ## Cost Objective
 
+## Cost Objective
+
 We evaluate policies by minimizing total operational cost:
-model_cost = fp_after * fp_cost + FN * fn_cost
+
+```
+model_cost        = fp_after * fp_cost + FN * fn_cost
 human_review_cost = k * human_cost
-total_cost = model_cost + human_review_cost
+total_cost        = model_cost + human_review_cost
+```
+
 Where:
-      fp_cost: fp_cost
-      fn_cost: fn_cost
-      human_cost: human_cost
-      review_rate: review_rate
-      human_reviews: k
-      false_positives_after: fp_after
-      false_negatives: FN
+
+- `fp_cost`        : cost of a false positive  
+- `fn_cost`        : cost of a false negative  
+- `human_cost`     : cost per reviewed case  
+- `review_rate`    : fraction of flagged alerts reviewed  
+- `k`              : number of reviewed cases  
+- `fp_after`       : false positives after review  
+- `FN`             : false negatives  
+
       
 
 ## Decision Pipeline
 
 The evaluated decision process follows:
 
-Model (probability scores)
-↓
-Decision Threshold (τ)
-↓
-Flagged Alerts
-↓
-Review Allocation Policy (π)
-↓
-Human Corrections
-↓
-Total Expected Operational Cost
+1. Model (probability scores)
+2. Decision Threshold (τ)
+3. Flagged Alerts
+4. Review Allocation Policy (π)
+5. Human Corrections
+6. Total Expected Operational Cost
 
 This repository isolates decision-layer effects without retraining the underlying classifier.
 
@@ -92,7 +95,7 @@ This repository isolates decision-layer effects without retraining the underlyin
 
 ## Repository Structure
 
-.
+```
 ├── data/                   # Dataset documentation (raw data not committed)
 ├── notebooks/              # All experimental code, evaluation logic, and grid searches (Jupyter)
 ├── figures/                # Reserved for optional generated plots (not committed by default)
@@ -107,6 +110,8 @@ This repository isolates decision-layer effects without retraining the underlyin
 ├── THREATS_AND_VALIDITY.md # Limitations and anticipated reviewer objections
 ├── PAPER_CLAIM.md          # Core research claims and contributions
 └── README.md               # Repository overview (this file)
+...
+```
 All experiments and analyses are implemented in Jupyter notebooks to emphasize transparency and reproducibility of decision-layer evaluation.
 
 
@@ -131,7 +136,8 @@ pip install -r requirements.txt
 Empirical analyses are executed in the following order:
 
 1. Notebooks in `notebooks/` for data loading, cost modeling, and evaluation
-2. Results are summarized and reported in:
+2. Methods & Results are summarized and reported in:
+   - `Mehods.md`
    - `RESULTS.md`
    - `RESULTS_NUMBERS.md`
 
