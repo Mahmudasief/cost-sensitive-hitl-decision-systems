@@ -44,6 +44,41 @@ This repository provides:
 This deliberate scope isolates decision-layer effects and avoids confounding from model capacity or training dynamics.
 
 
+## Cost Objective
+
+We evaluate policies by minimizing total operational cost:
+model_cost = fp_after * fp_cost + FN * fn_cost
+human_review_cost = k * human_cost
+total_cost = model_cost + human_review_cost
+Where:
+      fp_cost: fp_cost
+      fn_cost: fn_cost
+      human_cost: human_cost
+      review_rate: review_rate
+      human_reviews: k
+      false_positives_after: fp_after
+      false_negatives: FN
+      
+
+## Decision Pipeline
+
+The evaluated decision process follows:
+
+Model (probability scores)
+↓
+Decision Threshold (τ)
+↓
+Flagged Alerts
+↓
+Review Allocation Policy (π)
+↓
+Human Corrections
+↓
+Total Expected Operational Cost
+
+This repository isolates decision-layer effects without retraining the underlying classifier.
+
+
 ## Main Findings (High-Level)
 
  - Cost-sensitive threshold optimization alone often yields larger gains than adding human review.
@@ -73,6 +108,9 @@ This deliberate scope isolates decision-layer effects and avoids confounding fro
 ├── PAPER_CLAIM.md          # Core research claims and contributions
 └── README.md               # Repository overview (this file)
 All experiments and analyses are implemented in Jupyter notebooks to emphasize transparency and reproducibility of decision-layer evaluation.
+
+
+**Limitation:** This analysis assumes static models and fixed human correction rates; dynamic retraining, learning effects, and capacity constraints are not modeled.
 
 
 ## Reproducibility
