@@ -1,30 +1,43 @@
 ## Introduction
 
-Human-in-the-loop (HITL) decision systems are widely deployed in high-stakes machine learning applications, including anti-money laundering (AML), fraud detection, content moderation, and medical triage. In such settings, automated classifiers are routinely augmented with manual review pipelines under the assumption that human intervention reliably reduces error and operational risk. As a result, HITL architectures are often treated as a default best practice in production systems.
+Most production systems that use machine learning for high-stakes decisions don't operate in fully automated mode. In anti-money laundering, fraud detection, content moderation, and medical triage, the standard architecture is a classifier that flags cases for human review. 
+The assumption baked into this design is straightforward: humans catch what models miss, so adding review makes the system better.
 
-Despite their prevalence, the effectiveness of HITL systems is rarely evaluated through an explicit economic lens. Real-world decision systems operate under asymmetric error costs: false positives incur investigation and compliance burden, false negatives expose institutions to financial and regulatory risk, and human review introduces substantial operational cost. Nevertheless, HITL systems are typically evaluated using accuracy-centric metrics such as precision, recall, or area under the ROC curve (AUC), rather than total expected operational cost.
+This paper questions that assumption.
 
-This disconnect creates a critical gap between how HITL systems are evaluated in the literature and how they are deployed in practice. Improvements in local accuracy—particularly on reviewed cases—do not necessarily translate into global reductions in system-level cost. In fact, allocating human review without regard to cost structure or review selectivity may increase total expected cost, even when human reviewers outperform automated models on specific error types.
+The problem is that human review costs money. Analysts have to be paid, cases take time to close, and compliance overhead adds up. False positives cost money too — they consume review capacity without catching anything real. False negatives carry 
+their own costs, often much larger. When you lay these costs out explicitly, the question of whether to deploy human review, and how much, becomes an economic calculation — not just an accuracy question.
 
-In this work, we study human-in-the-loop decision systems from a cost-sensitive, decision-theoretic perspective. We model AML-style transaction monitoring as a probabilistic classification problem with thresholded decisions and optional manual review, and evaluate policies using total expected cost rather than predictive accuracy. Crucially, our analysis isolates the decision layer: we examine how threshold selection and review allocation determine system-level performance without retraining or modifying the underlying classifier. While AML serves as a motivating application, the formulation applies broadly to high-stakes decision systems with asymmetric error costs and optional human review.
+The machine learning literature has not treated it that way. HITL systems are evaluated almost universally on classification metrics: precision, recall, AUC. These metrics say nothing about whether the system-level cost went up or down. 
+A HITL policy can improve precision on reviewed cases while simultaneously increasing total operational cost — and standard evaluation would report it as an improvement.
 
-Through extensive empirical evaluation across a wide range of cost regimes, we demonstrate that naïvely applied HITL policies can increase total expected cost, even when human reviewers reduce false positives on reviewed instances. We identify three distinct empirical regimes in which (i) fully automated decision-making is optimal, (ii) selective HITL yields marginal economic gains, and (iii) HITL intervention strictly degrades system-level performance. Notably, these regime transitions occur without retraining the model, indicating that decision policy can dominate model choice in certain operational environments.
+We study this problem through a cost-sensitive, decision-theoretic lens. The setting is AML-style transaction monitoring: a fixed trained classifier assigns risk scores to transactions, a threshold determines which get flagged, and a 
+review policy determines which flagged cases go to a human analyst. We evaluate everything in terms of total expected cost — false positives, false negatives, and review costs combined — not accuracy.
 
-These results challenge the prevailing assumption that adding human review is inherently beneficial. Instead, we show that HITL effectiveness is conditional on cost asymmetry, review cost, and review allocation strategy. By reframing HITL evaluation as an economic decision problem rather than an accuracy optimization task, this work provides principled guidance for when human intervention should be deployed, how selectively it should be applied, and when it should be avoided entirely.
+The main finding is that naively applied HITL policies frequently increase total expected cost, even when human reviewers are more accurate than the model on reviewed cases. This is not a theoretical edge case. It happens across a wide 
+range of realistic cost configurations. The gains from human error correction are simply outweighed by the cost of the review itself, especially when review is applied indiscriminately to cases where the model was already right.
+
+We also show that optimizing the decision threshold alone — without any human review — often captures most of the available cost savings. The decision layer matters more than it is given credit for in practice.
+
+What makes this tractable as a study design is that we hold the classifier fixed throughout. We are not asking which model is best. We are asking how threshold selection and review allocation determine system-level cost, independent of model 
+choice. The answer is: quite a lot.
 
 ## Contributions
 
-This paper makes the following contributions:
+This paper makes five contributions:
 
- - We present a cost-first evaluation framework for HITL decision systems that explicitly models false-positive, false-negative, and human review costs.
+1. A cost-first evaluation framework for HITL decision systems that explicitly accounts for false-positive cost, false-negative cost, and human review cost.
 
- - We show that substantial system-level performance differences can be achieved through decision-layer optimization alone, without retraining the underlying classifier.
+2. A demonstration that decision-layer optimization — threshold selection and review allocation — can dominate model choice as a driver of system-level performance, without any retraining.
 
- - We provide a formal negative result, demonstrating that naïve HITL policies can increase total expected cost despite improving local accuracy.
+3. A formal negative result: naive HITL policies can increase total expected cost even when human reviewers outperform the model locally.
 
- - We characterize distinct cost regimes governing when automation, selective HITL, or no HITL is optimal.
+4. A characterization of three distinct cost regimes — automation-dominant, selective HITL, and HITL-degraded — and the conditions that determine which applies.
 
- - We introduce a failure taxonomy for HITL systems that explains when and why human intervention degrades operational efficiency.
+5. A failure taxonomy for HITL systems documenting the specific mechanisms by which human review degrades operational efficiency.
+
+
+
 
 
 
