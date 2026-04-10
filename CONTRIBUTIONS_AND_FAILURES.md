@@ -1,63 +1,48 @@
 # Contributions and Failure Taxonomy
 
-## Contributions
+## What This Work Contributes
 
-This work makes the following contributions:
+The core contribution is not a new model or a better algorithm. It is a reframing.
 
-### Contribution 1: Cost-First Evaluation of HITL Systems**  
-   We reformulate human-in-the-loop (HITL) decision systems as cost-optimization problems rather than accuracy-optimization problems. Unlike prior work that evaluates HITL using classification metrics (e.g., precision, recall, AUC), we evaluate performance using total expected operational cost, explicitly modeling false positives, false negatives, and human review costs.
+Most work on human-in-the-loop systems asks: how do we make human review more accurate? This paper asks a different question: given a fixed classifier and a fixed human reviewer, when does adding review actually reduce total operational cost — and when does it make things worse?
 
-### Contribution 2: Decision-Layer Optimization Without Retraining**  
-   We demonstrate that substantial performance differences can be achieved without retraining the underlying model, purely through threshold selection and selective human review policies. This isolates the decision layer as a dominant driver of system performance under asymmetric error costs.
+That shift in framing has five concrete outputs:
 
-### Contribution 3: Negative Results for Naïve HITL Policies**  
-   We provide empirical evidence that naïvely applied HITL policies can increase total expected cost, even when human reviewers outperform the model on false positives. This serves as a counterexample to the common assumption that adding human review is inherently beneficial.
+**1. A cost-first evaluation framework for HITL decision systems.** Rather than measuring precision, recall, or AUC, we evaluate every policy by its total expected cost: false positives, false negatives, and review costs combined. This is not the standard approach in the literature, and the difference matters — systems that look better on accuracy metrics can look worse on cost.
 
-### Contribution 4: Cost-Regime–Dependent HITL Effectiveness**  
-   We identify distinct economic regimes in which:
-   - Fully automated decision-making is optimal  
-   - Selective HITL yields marginal gains  
-   - HITL intervention strictly degrades system-level performance  
+**2. Evidence that the decision layer dominates model choice.** We hold the classifier fixed throughout and show that threshold selection and review allocation alone determine whether a system performs well or badly under asymmetric costs. You can get larger performance differences by changing the decision policy than by swapping models — without retraining anything.
 
-   These regimes are determined jointly by error cost asymmetry, human review cost, and review allocation strategy.
+**3. A formal negative result.** Naive HITL policies — fixed review rates applied uniformly to flagged cases — frequently increase total expected cost, even when human reviewers are more accurate than the model on the cases they see. This is not a theoretical edge case. It happens across wide ranges of realistic cost configurations.
 
-### Contribution 5: Actionable Guidance for AML Deployment**  
-   Using AML transaction monitoring as a case study, we derive operationally relevant guidance for when human review should be deployed, how selectively it should be applied, and when it should be avoided entirely.
+**4. A cost-regime map.** The conditions under which HITL helps versus hurts are not arbitrary. We identify three stable regimes — automation-dominant, selective HITL, and HITL-degraded — and characterize what determines which regime applies. The boundaries are driven by the ratio of false-negative cost to review cost, and by how selectively review is allocated.
+
+**5. Actionable deployment guidance for AML systems.** The findings translate directly into practice: optimize the decision threshold before deploying any human review, allocate review selectively to highest-risk cases, and treat review cost as a first-class input to system design — not an afterthought.
 
 ---
 
-## Failure Taxonomy for Human-in-the-Loop Systems
+## Failure Taxonomy for HITL Decision Systems
 
-We formalize the following failure modes for HITL decision systems:
+The following failure modes describe the specific mechanisms by which human review degrades system-level performance. Each is empirically grounded in the results of this study.
 
-### Failure Mode 1: Cost-Blind HITL Deployment
-Human review is added without explicitly modeling review cost or error asymmetry.  
-**Outcome:** Reduced false positives but increased total expected cost.
+**Failure Mode 1: Cost-Blind Deployment**
+Human review is introduced without explicitly modeling review cost or error asymmetry. The system flags cases, analysts review them, false positives go down — and total cost goes up. This is the most common failure mode in production AML systems. Reducing false positives is not the same as reducing cost.
 
-### Failure Mode 2: Recall-Dominant Cost Regimes
-False-negative costs are low relative to human review costs.  
-**Outcome:** HITL intervention degrades performance despite improved apparent precision.
+**Failure Mode 2: Recall-Dominant Cost Regimes**
+When false-negative costs are low relative to review costs, the expected benefit of catching an additional fraudulent transaction does not justify the cost of the review required to find it. HITL degrades performance in these regimes even when human reviewers are highly accurate.
 
-### Failure Mode 3: Over-Broad Review Policies
-Fixed or high review rates are applied uniformly across all flagged cases rather than selectively.  
-**Outcome:** Human effort is wasted on low-risk cases, eroding cost efficiency.
+**Failure Mode 3: Over-Broad Review Policies**
+Fixed or high review rates applied uniformly across all flagged transactions waste human effort on cases where the model was already right. The analyst's time has a cost. Spending it on low-risk alerts erodes whatever efficiency gains were available from reviewing the high-risk ones.
 
-### Failure Mode 4: Metric Illusion
-Improvements in standard machine learning metrics mask worsening operational outcomes.  
-**Outcome:** Systems appear improved while becoming economically inefficient.
+**Failure Mode 4: Metric Illusion**
+Standard ML metrics — precision, recall, F1, AUC — improve. Total expected cost increases. These outcomes are not contradictory; they measure different things. Systems can pass internal evaluation benchmarks while becoming economically worse. This failure mode is particularly dangerous because it is invisible to teams that do not model cost explicitly.
 
-### Failure Mode 5: Human Superiority Fallacy
-Assuming that higher human accuracy on reviewed cases guarantees system-level improvement.  
-**Outcome:** Local gains fail to translate into global cost reductions.
+**Failure Mode 5: Human Superiority Fallacy**
+Human reviewers outperform the model on the cases they see. Therefore HITL must help. This reasoning is wrong. Local accuracy improvements do not aggregate to global cost reductions when review itself is expensive and allocated without regard to impact. The reviewer being right more often is irrelevant if the cost of deploying the reviewer exceeds the value of the corrections.
 
 ---
 
-## Implications
+## What This Taxonomy Is For
 
-This taxonomy demonstrates that HITL effectiveness is not a function of human accuracy alone, but depends on where, when, and at what cost human intervention is applied. HITL systems must therefore be designed and evaluated as economic decision systems rather than hybrid classifiers.
+These failure modes are not hypothetical. They describe how real production HITL systems fail — quietly, in ways that accuracy metrics do not surface. The goal of formalizing them is to give practitioners and researchers a vocabulary for diagnosing when human review is working as intended and when it is not.
 
----
-
-## Positioning Statement
-
-This work reframes human-in-the-loop decision-making from a presumed best practice into a conditional design choice. By explicitly documenting failure cases and negative results, it challenges prevailing assumptions in applied machine learning and provides a principled framework for deciding when human intervention helps—and when it hurts.
+HITL is not inherently beneficial. It is a design choice with economic consequences. This taxonomy is a tool for making that choice deliberately.
