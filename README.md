@@ -30,6 +30,7 @@ This repository provides:
     - Selective HITL yields marginal gains
     - HITL strictly increases expected cost
  5. A formal negative result that serves as a counterexample to the assumption that adding human review is inherently beneficial.
+ 6. A formal failure taxonomy identifying five mechanisms by which HITL intervention degrades operational efficiency, documented in CONTRIBUTIONS_AND_FAILURES.md.
 
 
 ## Methodological Scope
@@ -109,6 +110,7 @@ This repository isolates decision-layer effects without retraining the underlyin
 ├── DISCUSSION.md                 # Interpretation and implications
 ├── THREATS_AND_VALIDITY.md       # Limitations and anticipated reviewer objections
 ├── PAPER_CLAIM.md                # Core research claims and contributions
+├── CONTRIBUTIONS_AND_FAILURES.md # Failure taxonomy for HITL decision systems
 └── README.md                     # Repository overview (this file)
 ...
 ```
