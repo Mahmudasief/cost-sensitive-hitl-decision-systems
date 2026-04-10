@@ -46,8 +46,6 @@ This deliberate scope isolates decision-layer effects and avoids confounding fro
 
 ## Cost Objective
 
-## Cost Objective
-
 We evaluate policies by minimizing total operational cost:
 
 ```
@@ -143,7 +141,7 @@ Empirical analyses are executed in the following order:
    threshold optimization, and HITL policy evaluation across cost regimes.
 
 Methods & Results are summarized and reported in:
-   - `Methods.md`
+   - `METHODS.md`
    - `RESULTS.md`
    - `RESULTS_NUMBERS.md`
 
