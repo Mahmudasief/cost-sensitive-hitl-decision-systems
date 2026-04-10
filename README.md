@@ -96,20 +96,22 @@ This repository isolates decision-layer effects without retraining the underlyin
 ## Repository Structure
 
 ```
-├── data/                   # Dataset documentation (raw data not committed)
-├── notebooks/              # All experimental code, evaluation logic, and grid searches (Jupyter)
-├── figures/                # Reserved for optional generated plots (not committed by default)
-├── results/                # Reserved for serialized outputs if needed (results reported in markdown)
-├── src/                    # Reserved for future modularization (current implementation is notebook-based)
-├── ABSTRACT.md             # Paper abstract
-├── INTRODUCTION.md         # Motivation and background
-├── METHODS.md              # Formal problem formulation and cost model
-├── RESULTS.md              # Empirical findings and regime analysis
-├── RESULTS_NUMBERS.md      # Quantitative results only (no interpretation)
-├── DISCUSSION.md           # Interpretation and implications
-├── THREATS_AND_VALIDITY.md # Limitations and anticipated reviewer objections
-├── PAPER_CLAIM.md          # Core research claims and contributions
-└── README.md               # Repository overview (this file)
+├── data/                         # Dataset documentation (raw data not committed)
+├── notebooks/
+│   ├── 01_eda.ipynb              # Exploratory data analysis and class imbalance visualization
+│   └── 02_baseline_models.ipynb  # Cost-sensitive thresholding, HITL policy grid search
+├── figures/                      # Reserved for optional generated plots (not committed by default)
+├── results/                      # Reserved for serialized outputs if needed (results reported in markdown)
+├── src/                          # Reserved for future modularization (current implementation is notebook-based)
+├── ABSTRACT.md                   # Paper abstract
+├── INTRODUCTION.md               # Motivation and background
+├── METHODS.md                    # Formal problem formulation and cost model
+├── RESULTS.md                    # Empirical findings and regime analysis
+├── RESULTS_NUMBERS.md            # Quantitative results only (no interpretation)
+├── DISCUSSION.md                 # Interpretation and implications
+├── THREATS_AND_VALIDITY.md       # Limitations and anticipated reviewer objections
+├── PAPER_CLAIM.md                # Core research claims and contributions
+└── README.md                     # Repository overview (this file)
 ...
 ```
 All experiments and analyses are implemented in Jupyter notebooks to emphasize transparency and reproducibility of decision-layer evaluation.
@@ -135,9 +137,13 @@ pip install -r requirements.txt
 ### Execution Order
 Empirical analyses are executed in the following order:
 
-1. Notebooks in `notebooks/` for data loading, cost modeling, and evaluation
-2. Methods & Results are summarized and reported in:
-   - `Mehods.md`
+1. `notebooks/01_eda.ipynb` — Exploratory data analysis: class imbalance, 
+   transaction amount distribution, fraud rate by amount, and feature correlations.
+2. `notebooks/02_baseline_models.ipynb` — Baseline model training, cost-sensitive 
+   threshold optimization, and HITL policy evaluation across cost regimes.
+
+Methods & Results are summarized and reported in:
+   - `Methods.md`
    - `RESULTS.md`
    - `RESULTS_NUMBERS.md`
 
