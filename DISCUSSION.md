@@ -1,50 +1,81 @@
 # Discussion
 
-This work reframes human-in-the-loop (HITL) decision systems as economic decision problems rather than accuracy optimization tasks. Our results demonstrate that the effectiveness of human review is not universal, but highly conditional on cost asymmetry, review cost, and review allocation strategy. In this section, we interpret the empirical findings, discuss implications for deployment and research, and clarify the limits of the analysis.
+The central result of this paper is simple to state: adding human review to an automated decision system does not reliably reduce total operational cost. Whether 
+it helps or hurts depends on cost structure, and in the most common AML cost configurations we tested, it hurts.
 
-## Why HITL Often Fails in Practice
+This section unpacks what that means and why it matters.
 
-A central finding of this study is that naïvely applied HITL policies can increase total expected cost, even when human reviewers outperform automated models on specific error types such as false positives. This failure arises from a systematic mismatch between local performance improvements and global system objectives.
+---
 
-Specifically, improvements on reviewed cases do not translate into system-level cost reductions when review costs are non-trivial or when review capacity is allocated to low-impact cases. In such regimes, the marginal benefit of error correction is outweighed by the operational cost of review itself. This mechanism provides a concrete explanation for why many production HITL systems experience persistent investigator overload despite continued investment in manual review.
+## Why Human Review Fails More Often Than Expected
 
-These findings challenge the widespread assumption that human review is inherently beneficial. That assumption emerges from evaluating HITL systems using accuracy-centric metrics, which fail to capture downstream operational costs and decision-level trade-offs.
+The standard argument for HITL goes like this: humans catch errors models miss, so adding review reduces false positives, and fewer false positives means lower 
+cost. The logic is intuitive but incomplete.
 
-## Decision Policy Versus Model Choice
+What it misses is that review itself has a cost. Every analyst-hour spent closing an alert is money spent. If the expected benefit of catching an additional false 
+positive — the cost saved by correctly dismissing it — is smaller than the cost of the review that found it, the system is worse off with review than without it. 
+This is not a theoretical edge case. It is what we observe across most of the cost configurations we tested.
 
-An important implication of our results is that decision policy can dominate model choice under asymmetric error costs. Across all observed empirical regimes, transitions between automation-dominant, selective HITL, and HITL-dominant failure modes occur without retraining the underlying classifier.
+The second problem is allocation. Fixed-rate review policies — apply review to some fraction of flagged cases, selected at random or by queue order — waste 
+human effort on cases the model already handled correctly. An analyst reviewing a true positive that would have been correctly flagged anyway contributes nothing 
+to cost reduction. The review cost is incurred; no benefit is realized.
 
-This demonstrates that threshold selection and review allocation are first-order determinants of system-level performance in high-stakes decision systems. In many operational environments, optimizing the decision layer yields larger economic gains than improving predictive accuracy through model retraining.
+These two mechanisms — review cost exceeding correction value, and effort misallocated to low-impact cases — explain the majority of HITL failure cases we document.
 
-This result challenges the prevailing model-centric emphasis in HITL research and highlights the need to study human review as part of an integrated decision pipeline rather than as a post-hoc accuracy enhancement.
+---
 
-## Implications for Deployment
+## The Decision Layer Is More Powerful Than It Looks
 
-The results suggest that HITL systems should not be deployed by default. Instead, human review should be treated as an economic intervention whose value must be justified under explicit cost assumptions.
+A secondary finding that surprised us: optimizing the decision threshold alone, without any human review, recovered most of the available cost savings.
 
-In practice, this implies that:
+This matters because it reorders the standard deployment logic. The conventional approach is to train a model, deploy it with a default threshold, and then layer 
+human review on top to handle errors. What our results suggest is that threshold optimization should come first — before any decision about whether to deploy 
+review at all. In many regimes, getting the threshold right makes review unnecessary. In others, it reduces the volume of cases that need review to the point where review becomes cost-effective.
 
-  - Automated decision thresholds should be optimized for total expected cost before introducing human review.
+The broader implication is that the decision layer — threshold and review allocation policy — deserves at least as much engineering attention as the model itself. In practice it gets far less.
 
-  - Review capacity should be selectively allocated to cases with the highest marginal expected cost reduction.
+---
 
-  - Fixed-rate or indiscriminate review policies are likely to degrade system performance across many realistic cost regimes.
+## When HITL Actually Helps
 
-Absent explicit cost modeling, HITL systems may increase operational burden rather than reduce risk—even when human reviewers exhibit high local accuracy.
+Human review does improve system-level cost under specific conditions, and it is worth being precise about what those conditions are.
+
+Review helps when false-negative costs are high enough that catching additional missed cases justifies the cost of the review required to find them. In AML 
+terms: when the expected loss from a missed illicit transaction substantially exceeds the cost of an analyst reviewing the alert. Review also needs to be 
+allocated selectively — concentrated on the highest-risk flagged cases rather than spread uniformly across the alert queue.
+
+When both conditions hold simultaneously, selective HITL yields modest but real cost reductions. When either condition fails — false-negative costs are 
+moderate, or review is applied broadly — the gains disappear or reverse.
+
+This conditionality is the core finding. HITL is not a universally good intervention. It is a conditional one.
+
+---
 
 ## Limitations
 
-This study adopts several simplifying assumptions that delimit the scope of the conclusions.
+Three limitations of this study are worth being direct about.
 
-First, human review accuracy and cost are modeled as fixed and exogenous. In real-world settings, reviewer performance varies across individuals, over time, and with workload. While sensitivity analyses indicate that the qualitative regime structure is stable across wide parameter ranges, modeling endogenous and dynamic human behavior remains an important direction for future work.
+First, human reviewer accuracy is modeled as a fixed parameter. Real reviewers vary — across individuals, across time, with workload and fatigue. We ran 
+sensitivity analyses across a range of correction probabilities (0.5 to 0.9) and the qualitative regime structure held, but the exact regime boundaries would shift with more realistic reviewer models.
 
-Second, the analysis assumes a fixed underlying classifier and does not incorporate retraining, feedback loops, or active learning. This is a deliberate design choice to isolate decision-layer effects. Incorporating retraining may shift regime boundaries but would not eliminate the fundamental cost trade-offs identified here.
+Second, the classifier is fixed throughout. We deliberately excluded retraining to isolate decision-layer effects, but in practice classifiers are periodically 
+retrained on new data, and retraining shifts the regime boundaries. The decision-policy effects we identify are real, but they interact with model quality in ways this study does not fully capture.
 
-Third, the empirical evaluation relies on AML-style datasets and abstracted cost parameters rather than proprietary bank data. The contribution of this work is methodological rather than benchmark-driven: the findings concern decision-policy structure and cost asymmetry, which are dataset-agnostic under standard supervised learning assumptions.
+Third, the empirical evaluation uses the public Kaggle credit card fraud dataset as a proxy for AML transaction monitoring. This dataset has known limitations — 
+it is highly imbalanced, features are anonymized via PCA, and it does not reflect the network structure of real money laundering activity. The contribution of this 
+paper is methodological rather than empirical: the cost-regime framework applies regardless of dataset, but the specific numbers reported are not transferable to production AML systems without recalibration.
 
-Finally, the decision policies considered are static. Extensions to dynamic or sequential decision-making frameworks—such as bandit-based or adaptive review allocation—are left for future research.
+---
 
-## Summary
+## What This Changes
 
-Overall, this work demonstrates that HITL effectiveness is not a function of human accuracy alone, but of how human intervention is embedded within a cost-sensitive decision system. By explicitly modeling economic trade-offs at the decision layer, we show when human-in-the-loop systems reduce operational cost—and when they systematically increase it.
+If the findings hold — and the regime structure is stable enough across parameter ranges that we believe they do — then the standard HITL deployment 
+logic needs to be revised.
+
+The question should not be "should we add human review?" as if review is costless and universally beneficial. The question should be "what is the 
+expected cost reduction from review under our specific cost parameters, and does it exceed the cost of the review itself?" That calculation requires 
+explicit cost modeling. Most production systems do not do it.
+
+This paper does not argue that human review is bad. It argues that human review is expensive, that its benefits are conditional, and that deploying 
+it without cost modeling is a form of optimism that production data does not consistently support.
 
