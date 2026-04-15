@@ -1,84 +1,83 @@
 # Threats to Validity and Reviewer Objections
 
-This section addresses potential threats to validity and anticipates common reviewer objections regarding scope, assumptions, and generalizability of the proposed findings.
-
 ## Threats to Internal Validity
 
 ### Simplified Human Review Model
-Human reviewers are modeled using fixed accuracy and cost parameters. In real AML operations, reviewer accuracy may vary across investigators, over time, and with workload.
 
-**Mitigation:**  
-The objective of this study is not to model human cognition but to analyze decision-layer economics. Sensitivity analyses across a wide range of reviewer accuracy and cost parameters demonstrate that the qualitative findings persist across plausible operational regimes.
-Specifically, we observe consistent regime boundaries across reviewer correction probabilities ranging from 0.5 to 0.9.
+Human reviewers are modeled using fixed accuracy and cost parameters. In real AML operations, reviewer accuracy varies across investigators, changes over time, and degrades with workload. None of that is captured here.
 
-### Assumption of Fixed Cost Parameters
-False-positive, false-negative, and review costs are treated as exogenous and fixed.
+**Mitigation:** The goal is not to model human cognition — it is to analyze decision-layer economics. We ran sensitivity analyses across reviewer correction probabilities from 0.5 to 0.9 and the regime structure held throughout. The qualitative finding does not depend on any specific assumption about how accurate human reviewers are.
 
-**Mitigation:**  
-These parameters represent abstracted operational burden rather than literal dollar costs. The analysis is explicitly regime-based, and conclusions are framed conditionally on cost asymmetry rather than absolute values.
+### Fixed Cost Parameters
+
+False-positive, false-negative, and review costs are treated as fixed throughout the analysis.
+
+**Mitigation:** These are abstracted operational costs, not literal dollar figures. The analysis is explicitly regime-based — conclusions are stated conditionally, not as universal cost estimates. The sensitivity analysis in SENSITIVITY_ANALYSIS.md shows that the qualitative pattern holds across wide ranges of all three cost parameters.
 
 ---
 
 ## Threats to External Validity
 
-### Domain Specificity to AML/Fraud Detection
-The empirical evaluation focuses on AML-style fraud detection tasks with severe class imbalance.
+### Domain Specificity
 
-**Mitigation:**  
-The proposed framework applies broadly to any high-stakes decision system with asymmetric error costs and optional human review, including medical triage, content moderation, and risk screening. AML is used as a representative, not exclusive, domain.
+The empirical evaluation uses AML-style fraud detection as its setting. Fraud detection has specific characteristics — severe class imbalance, asymmetric error costs, high-volume transaction data — that may not generalize to every HITL deployment.
 
-### Use of Public or Synthetic Datasets
-The study relies on publicly available or AML-style datasets rather than proprietary bank data.
+**Mitigation:** The cost-sensitive decision framework applies to any binary classification system with asymmetric error costs and optional human review. AML is the motivating application, but the findings about cost regimes and decision-layer optimization are not domain-specific. The same analysis applies to medical triage, content moderation, or any setting where review has a meaningful cost.
 
-**Mitigation:**  
-The contribution is methodological rather than empirical benchmarking; conclusions concern decision-policy structure and cost trade-offs, not absolute performance levels.
+### Use of Public Dataset
+
+The study uses the Kaggle credit card fraud dataset rather than proprietary bank data.
+
+**Mitigation:** The contribution is methodological, not a benchmark. The paper makes claims about cost-regime structure and decision-policy effects, not about absolute fraud detection performance. Those claims hold regardless of which dataset is used, provided the cost model is correctly specified.
 
 ---
 
-## Modeling Assumptions and Scope Limitations
+## Modeling Assumptions and Scope
 
-### No Model Retraining or Active Learning
-The analysis assumes a fixed underlying classifier and does not incorporate retraining, feedback loops, or adaptive learning from human review.
+### No Model Retraining
 
-**Rationale:**  
-This is a deliberate design choice to isolate decision-layer effects. Incorporating retraining would confound policy-level conclusions and obscure the role of thresholding and review allocation.
+The classifier is held fixed throughout. There is no retraining, no active learning, no feedback from human corrections back into the model.
 
-### Static Decision Policies
-HITL policies are evaluated as static mappings rather than dynamic or sequential decision processes.
+**Rationale:** This is deliberate. Retraining would confound the decision-layer effects we are trying to isolate. The question is what threshold selection and review allocation can accomplish given a fixed model — not what a better model might achieve.
 
-**Rationale:**  
-The static formulation reflects how most production AML systems are deployed in practice. Extensions to dynamic or bandit-based policies are left for future work.
+### Static Review Policies
+
+HITL policies are evaluated as fixed rules, not as adaptive or sequential decision processes. The system does not learn from past review decisions or adjust allocation over time.
+
+**Rationale:** Most production AML systems operate this way. Static rule-based review allocation is the norm, not the exception. Extensions to dynamic or bandit-based policies are a natural direction for future work.
 
 ---
 
 ## Anticipated Reviewer Objections
 
-### Objection 1: “Humans outperform models, so HITL should always help”
-**Response:**  
-Local accuracy improvements do not imply global cost reductions. We show that HITL can increase total expected cost even when human reviewers outperform the model on false positives.
+### Objection 1: "Humans outperform models on reviewed cases, so HITL must help"
 
-### Objection 2: “Results depend on unrealistic cost settings”
-**Response:**  
-The paper explicitly avoids universal claims. Results are presented as conditional on cost regimes, and negative outcomes occur across wide, realistic parameter ranges.
+**Response:** Local accuracy on reviewed cases and global system cost are different things. We show repeatedly that human reviewers can outperform the model on false positives within the reviewed subset while the total system cost still goes up. The mechanism is simple: review costs money, and those costs can exceed the value of the corrections made.
 
-### Objection 3: “This is obvious to practitioners”
-**Response:**  
-Despite practitioner intuition, HITL is routinely deployed without explicit cost modeling. The prevalence of naive review policies in production systems suggests that these trade-offs are not formally operationalized, despite their prevalence in production systems.
+### Objection 2: "These cost settings are unrealistic"
 
-### Objection 4: “The contribution is incremental”
-**Response:**  
-Prior work evaluates HITL primarily through accuracy metrics or human-model agreement. This work reframes HITL as an economic decision problem and provides formal counterexamples to widely held assumptions.
+**Response:** The primary cost configuration (FP=$5, FN=$500, review=$20) is a stylized AML setting, not a claim about real bank numbers. The sensitivity analysis tests 240 combinations across wide parameter ranges. The finding — that HITL is unviable when review costs $20 or more per case — holds across all of them.
+
+### Objection 3: "Practitioners already know this"
+
+**Response:** If practitioners know it, production systems do not show it. HITL is routinely deployed without explicit cost modeling, and investigator overload is a persistent complaint in AML operations precisely because review volume is not calibrated against expected cost savings. Knowing something intuitively and operationalizing it formally are different things.
+
+### Objection 4: "The contribution is incremental"
+
+**Response:** Prior HITL work evaluates systems on classification metrics — precision, recall, AUC. This paper evaluates on total expected cost and shows that accuracy improvements and cost reductions are not the same thing, and can move in opposite directions. That reframing, plus the formal negative result and the failure taxonomy, is not an incremental contribution to the existing literature.
+
+### Objection 5: "No statistical significance testing is reported"
+
+**Response:** This objection misapplies the concept. Statistical significance testing is for stochastic processes — situations where results vary across repeated trials due to randomness. This pipeline has no randomness. The classifier is fixed, the test set is fixed, cost calculations are arithmetic on exact counts. Running the same configuration twice gives the same number. P-values are not meaningful here and reporting them would misrepresent the nature of the analysis.
+
+Robustness for a deterministic system is demonstrated by showing the finding holds across a range of parameter assumptions. That is what SENSITIVITY_ANALYSIS.md does — 240 configurations, wide parameter ranges, stable qualitative result throughout.
 
 ---
 
 ## Positioning Relative to Prior Work
 
-This study does not argue against human review per se. Instead, it demonstrates that HITL effectiveness is conditional, not universal. By formalizing failure modes and negative results, the paper complements prior work that focuses exclusively on HITL benefits.
+This paper is not an argument against human review. The claim is narrower: HITL effectiveness depends on cost structure, and deploying review without modeling that structure is likely to increase total operational cost in realistic AML environments.
 
-The primary contribution is conceptual: shifting HITL evaluation from accuracy-centric thinking to cost-sensitive decision optimization.
+Prior HITL work has documented when and how human review improves accuracy. That work is not wrong — it answers a different question. This paper asks when human review reduces total operational cost, and finds that the answer depends almost entirely on how expensive that review is, not on how severe the errors are.
 
----
-
-## Summary
-
-The key limitation of this work is intentional: abstraction. By simplifying human behavior and focusing on decision-layer economics, we isolate when and why HITL succeeds or fails. This trade-off enables principled insight at the expense of fine-grained behavioral realism.
+The practical implication is not "remove humans from the loop." It is "model the cost before you add humans to the loop."
