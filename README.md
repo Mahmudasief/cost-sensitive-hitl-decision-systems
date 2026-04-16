@@ -85,7 +85,7 @@ This repository isolates decision-layer effects without retraining the underlyin
 ├── notebooks/
 │   ├── 01_eda.ipynb               # Exploratory data analysis and class imbalance visualization
 │   └── 02_baseline_models.ipynb   # Cost-sensitive thresholding, HITL policy grid search, sensitivity analysis
-├── figures/                       # Generated plots including HITL regime heatmap
+├── figures/                       # Cost-vs-threshold plots (RF, LR), EDA charts, HITL regime heatmap
 ├── results/                       # Reserved for serialized outputs (results reported in markdown)
 ├── src/                           # Reserved for future modularization
 ├── ABSTRACT.md                    # Paper abstract
