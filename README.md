@@ -152,4 +152,8 @@ These findings explain why many production HITL systems suffer from investigator
 
 ## Citation
 
-If you reference this work, please cite the repository and accompanying manuscript materials.
+If you reference this work, please cite:
+
+Mahmud, M. A. (2026). Cost-Sensitive Human-in-the-Loop Decision Systems 
+Under Asymmetric Error Costs. SSRN Working Paper 6592940.
+https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6592940
